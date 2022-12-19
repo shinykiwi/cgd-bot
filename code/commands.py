@@ -3,7 +3,7 @@ import datetime
 import interactions
 from discord import Attachment
 
-bot = interactions.Client(token="MTA1NDQzMTA1NDIzODMyNjg1NA.GF9ecw.RoCGzzKxTqvf0dMA7I_hHKARyASQ5mlWkJDabk")
+bot = interactions.Client(token="MTA1NDQzMTA1NDIzODMyNjg1NA.GHB8eb.C5XsQ3LtPdTwNS3GmGR_0PAsPwXiBbRQpH8ZDE")
 
 
 @bot.command(
