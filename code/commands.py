@@ -2,9 +2,10 @@ import asyncio
 import datetime
 
 import interactions
-from discord import Attachment
+from discord import Attachment, Role
 from interactions import ComponentContext
 from interactions.ext.wait_for import wait_for_component, setup
+from interactions.ext.paginator import Paginator, Page
 
 bot = interactions.Client(token="MTA1NDQzMTA1NDIzODMyNjg1NA.GHB8eb.C5XsQ3LtPdTwNS3GmGR_0PAsPwXiBbRQpH8ZDE")
 
@@ -136,6 +137,57 @@ async def embed(ctx: interactions.CommandContext, title: str, description: str, 
     except asyncio.TimeoutError:
         await ctx.send("You took too long to respond!", ephemeral=True)
         return
+
+
+@bot.command(
+    name="reaction_role",
+    description="Adds a reaction role onto the message.",
+    scope=1054436256676860054,
+    options=[
+        interactions.Option(
+            name="message_id",
+            description="The ID of the message you want to add the reaction role to.",
+            type=interactions.OptionType.STRING,
+            required=True,
+        ),
+        interactions.Option(
+            name="emoji",
+            description="The emoji you want to add to the message that triggers the role adding.",
+            type=interactions.OptionType.STRING,
+            required=True,
+        ),
+        interactions.Option(
+            name="role",
+            description="The role you want to give to the user when they react.",
+            type=interactions.OptionType.ROLE,
+            required=True,
+        ),
+    ],
+)
+async def reaction_role(ctx: interactions.CommandContext, message_id: int, emoji: str, role: Role):
+
+    await ctx.send("Done!")
+
+@bot.command(
+    name="calendar",
+    description="Shows this semester's most up to date calendar.",
+    scope=1054436256676860054,
+)
+async def calendar(ctx: interactions.CommandContext):
+
+    pages = [
+        Page(
+            embeds=interactions.Embed(
+                title="January",
+                description="Last updated: <t:1671394504:R>",
+                image=interactions.EmbedImageStruct(url="https://cdn.discordapp.com/attachments/1054436257259847752/1054493897176395896/image.png"),
+                color=int("5865F2", 16),
+            ),
+
+        )
+    ]
+
+    await ctx.send(embeds=embed)
 
 
 bot.start()
