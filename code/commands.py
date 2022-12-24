@@ -1,14 +1,30 @@
 import asyncio
-import datetime
+import os
+
 import interactions
-from interactions import Intents
+from interactions import Intents, ClientPresence, PresenceActivity, PresenceActivityType
 from discord import Attachment, Role
 from interactions import ComponentContext
 from interactions.ext.wait_for import wait_for_component, setup
 from interactions.ext.paginator import Paginator, Page
+from dotenv import load_dotenv
 
-bot = interactions.Client(token="MTA1NDQzMTA1NDIzODMyNjg1NA.GHB8eb.C5XsQ3LtPdTwNS3GmGR_0PAsPwXiBbRQpH8ZDE",
-                          intents=Intents.DEFAULT | Intents.GUILD_MESSAGE_CONTENT)
+load_dotenv()
+token = os.getenv("DISCORD_TOKEN")
+
+
+# Create presence for the bot
+presence = ClientPresence(
+    activities=[
+        PresenceActivity(
+            type=PresenceActivityType.WATCHING, name="over CGD members!"
+        )
+    ]
+)
+
+bot = interactions.Client(token=token,
+                          intents=Intents.DEFAULT | Intents.GUILD_MESSAGE_CONTENT,
+                          presence=presence)
 
 setup(bot)
 
