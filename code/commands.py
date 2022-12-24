@@ -1,17 +1,19 @@
 import asyncio
 import datetime
-
 import interactions
+from interactions import Intents
 from discord import Attachment, Role
 from interactions import ComponentContext
 from interactions.ext.wait_for import wait_for_component, setup
 from interactions.ext.paginator import Paginator, Page
 
-bot = interactions.Client(token="MTA1NDQzMTA1NDIzODMyNjg1NA.GHB8eb.C5XsQ3LtPdTwNS3GmGR_0PAsPwXiBbRQpH8ZDE")
+bot = interactions.Client(token="MTA1NDQzMTA1NDIzODMyNjg1NA.GHB8eb.C5XsQ3LtPdTwNS3GmGR_0PAsPwXiBbRQpH8ZDE",
+                          intents=Intents.DEFAULT | Intents.GUILD_MESSAGE_CONTENT)
 
 setup(bot)
 
 
+# Submits an emoji to the channel for voting
 @bot.command(
     name="submit_emoji",
     description="Creates an embed with your info.",
@@ -48,7 +50,7 @@ async def submit_emoji(ctx: interactions.CommandContext, name: str, emoji: Attac
     await ctx.message.create_reaction("✅")
     await ctx.message.create_reaction("❌")
 
-
+# Creates a new custom embed based on user input
 @bot.command(
     name="embed",
     description="Creates an embed with your info.",
@@ -92,18 +94,20 @@ async def submit_emoji(ctx: interactions.CommandContext, name: str, emoji: Attac
         )
     ],
 )
+
+
 async def embed(ctx: interactions.CommandContext, title: str, description: str, show_author: bool,
-                image: Attachment = None, thumbnail: Attachment = None, color: str = None, ):
+                image: Attachment = None, thumbnail: Attachment = None, color: str = None):
+    c = int("5865F2", 16)
+
     if color:
-        color.startswith("#")
-        color = int(color[1:], 16)
-    else:
-        color = int("5865F2", 16),
+        if color.startswith("#"):
+            c = int(color[1:], 16)
 
     new_embed = interactions.Embed(
         title=title,
         description=description,
-        color=color,
+        color=c,
         image=interactions.EmbedImageStruct(url=image.url) if image else None,
         author=interactions.EmbedAuthor(
             name=ctx.author.name,
@@ -165,8 +169,8 @@ async def embed(ctx: interactions.CommandContext, title: str, description: str, 
     ],
 )
 async def reaction_role(ctx: interactions.CommandContext, message_id: int, emoji: str, role: Role):
-
     await ctx.send("Done!")
+
 
 @bot.command(
     name="calendar",
@@ -174,13 +178,13 @@ async def reaction_role(ctx: interactions.CommandContext, message_id: int, emoji
     scope=1054436256676860054,
 )
 async def calendar(ctx: interactions.CommandContext):
-
     pages = [
         Page(
             embeds=interactions.Embed(
                 title="January",
                 description="Last updated: <t:1671394504:R>",
-                image=interactions.EmbedImageStruct(url="https://cdn.discordapp.com/attachments/1054436257259847752/1054493897176395896/image.png"),
+                image=interactions.EmbedImageStruct(
+                    url="https://cdn.discordapp.com/attachments/1054436257259847752/1054493897176395896/image.png"),
                 color=int("5865F2", 16),
             ),
 
@@ -188,6 +192,46 @@ async def calendar(ctx: interactions.CommandContext):
     ]
 
     await ctx.send(embeds=embed)
+
+# Edits an existing embed's title and/or description
+@bot.command(
+    name="edit_embed",
+    description="Edit an existing embed's content.",
+    scope=1054436256676860054,
+    options=[
+        interactions.Option(
+            name="message_id",
+            description="Right click a message and click \'Copy ID\'",
+            type=interactions.OptionType.STRING,
+            required=True,
+        ),
+        interactions.Option(
+            name="title",
+            description="Change the title.",
+            type=interactions.OptionType.STRING,
+            required=False,
+        ),
+        interactions.Option(
+            name="description",
+            description="Change the description.",
+            type=interactions.OptionType.STRING,
+            required=False,
+        )
+    ]
+)
+async def edit_embed(ctx: interactions.CommandContext, message_id: str, title: str = None, description: str = None):
+    message = await ctx.channel.get_message(int(message_id))
+    membed = message.embeds[0]
+
+    if not(title or description):
+        await ctx.send("You did not specify any fields to edit! Please use the command again. ❌", ephemeral=True)
+    else:
+        if title:
+            membed.title = title
+        if description:
+            membed.description = description
+        await message.edit(embeds=membed)
+        await ctx.send("Embed edited! ✅", ephemeral=True)
 
 
 bot.start()
